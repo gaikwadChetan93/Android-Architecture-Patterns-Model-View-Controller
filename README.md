@@ -6,6 +6,7 @@
 An app which displays the top-rated English movies in a list. Display the movie title along with the rating of the movie. Implement a cache to store the top-rated movie data into a Room database locally. Use the cache data when the app requests the data, if data is not available in cache or in offilne mode, then fetch data from the API and update the cache. Also add a workmanager to update the cache once in a day.
 
 TMDB console URL: https://www.themoviedb.org/ 
+
 API key URL: https://www.themoviedb.org/settings/api
 
 **API information:**
