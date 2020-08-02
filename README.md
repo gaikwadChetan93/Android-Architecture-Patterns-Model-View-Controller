@@ -14,6 +14,7 @@ App architecture is a way of organizing the different modules of the project in 
 
 Let's look at a high level diagram of the Model-View-View-Model(MVVM) architecture.
 
+![alt text](https://github.com/gaikwadChetan93/Android-Architecture-Patterns-Model-View-Controller/blob/master/Architecture%20Diagram.png?raw=true)
 
 
 
