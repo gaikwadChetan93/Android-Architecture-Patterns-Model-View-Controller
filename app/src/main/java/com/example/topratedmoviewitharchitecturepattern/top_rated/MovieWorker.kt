@@ -29,7 +29,7 @@ class MovieWorker(private val appContext: Context, workerParams: WorkerParameter
             val movieApi = retrofit.create(MovieApi::class.java)
             try {
                 val movieResponse =
-                    movieApi.fetchTopRatedMovies("1d9a4704d81b27085f142914119d38fe")
+                    movieApi.fetchTopRatedMovies("YOUR TMDB API KEY")
                 db.movieDao().addMovies(movieResponse.results.mapToDbMovie())
             } catch (e: Exception) {
                 e.printStackTrace()
