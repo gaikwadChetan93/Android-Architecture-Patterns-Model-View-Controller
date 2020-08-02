@@ -2,7 +2,34 @@
 
 # Android Architecture Patterns: Model-View-Controller
 
-App architecture is a way of organizing the different modules of the project in a way to make the code easy to understand, well structured, easier to work with and manage the responsibility of each module efficiently. There are many architecture patterns available in Android like Model-View-Controller(MVC), Model-View-Presenter(MVP), Model-View-Intent(MVI), Model-View-View-Model(MVVM) etc. But in this chapter we are going to focus on Model-View-View-Model(MVVM) App architecture. Why Model-View-View-Model(MVVM)?
+## PROBLEM STATEMENT 
+An app which displays the top-rated English movies in a list. Display the movie title along with the rating of the movie. Implement a cache to store the top-rated movie data into a Room database locally. Use the cache data when the app requests the data, if data is not available in cache or in offilne mode, then fetch data from the API and update the cache. Also add a workmanager to update the cache once in a day.
+
+TMDB console URL: https://www.themoviedb.org/ 
+API key URL: https://www.themoviedb.org/settings/api
+
+**API information:**
+
+|   |   |
+| ------------ | ------------ |
+|  API type  |  GET|
+|  BASE URL | https://api.themoviedb.org/3/  |
+|  TOP RATED MOVIE ENDPOINT | /movie/top_rated  |
+|  GET PARAMETER |  api_key  |
+
+
+Libraries used
+1. Room database
+2. Coroutines
+3. Retrofit 
+4. LiveData
+5. WorkManager
+6. ViewModel
+7. Mockito
+
+App architecture is a way of organizing the different modules of the project in a way to make the code easy to understand, well structured, easier to work with and manage the responsibility of each module efficiently. There are many architecture patterns available in Android like Model-View-Controller(MVC), Model-View-Presenter(MVP), Model-View-Intent(MVI), Model-View-View-Model(MVVM) etc. Here we are going to focus on Model-View-View-Model(MVVM) App architecture. 
+
+**Why Model-View-View-Model(MVVM)?**
 
 · Officially endorsed by Google
 
@@ -18,7 +45,6 @@ Let's look at a high level diagram of the Model-View-View-Model(MVVM) architectu
 
 
 
-After that we will look at the detailed explanation of each component.
 
 
 Let’s explore each component and their responsibilities in detail 
