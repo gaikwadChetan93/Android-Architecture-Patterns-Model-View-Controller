@@ -31,7 +31,6 @@ class Exercise03 : AppCompatActivity() {
             ViewModelProvider(
                 this,
                 MovieViewModel.Factory(
-                    application,
                     MovieRepository(
                         RetrofitClient.getRetrofitClient(),
                         MovieDatabase.getInstance(application)
