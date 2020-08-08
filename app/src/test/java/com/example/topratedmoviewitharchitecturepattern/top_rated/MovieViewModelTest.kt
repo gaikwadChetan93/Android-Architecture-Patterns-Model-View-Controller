@@ -1,8 +1,10 @@
 package com.example.topratedmoviewitharchitecturepattern.top_rated
 
+import androidx.lifecycle.MutableLiveData
 import com.example.topratedmoviewitharchitecturepattern.CoroutineTestRule
 import io.mockk.MockKAnnotations
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +50,9 @@ class MovieViewModelTest {
     @Test
     fun `should invoke fetchMovies of MovieRepository when fetchMovies is called`() {
         runBlocking {
+            every { movieRepository.getMovies() }.returns(MutableLiveData())
             sut.fetchMovies()
             coVerify(atMost = 1) { movieRepository.fetchMovies() }
-            //verify(movieRepository, times(1)).fetchMovies()
         }
     }
 }

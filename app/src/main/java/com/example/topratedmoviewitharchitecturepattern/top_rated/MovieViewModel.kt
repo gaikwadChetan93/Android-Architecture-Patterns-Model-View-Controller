@@ -8,10 +8,9 @@ import kotlinx.coroutines.launch
 class MovieViewModel(
     private val movieRepository: MovieRepository
 ) : ViewModel() {
-    private var movieResponseLiveData: LiveData<List<Movie>> = MutableLiveData<List<Movie>>()
 
     fun getMovies(): LiveData<List<Movie>> {
-        return movieResponseLiveData
+        return movieRepository.getMovies()
     }
 
     fun fetchMovies() {
