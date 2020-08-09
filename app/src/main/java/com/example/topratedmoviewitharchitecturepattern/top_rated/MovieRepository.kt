@@ -1,6 +1,7 @@
 package com.example.topratedmoviewitharchitecturepattern.top_rated
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.topratedmoviewitharchitecturepattern.database.MovieDatabase
 import com.example.topratedmoviewitharchitecturepattern.ext.mapToDbMovie
@@ -16,7 +17,7 @@ class MovieRepository(
 
     private val movieResponseLiveData = MutableLiveData<List<Movie>>()
 
-    fun getMovies(): MutableLiveData<List<Movie>> {
+    fun getMovies(): LiveData<List<Movie>> {
         return movieResponseLiveData
     }
 

@@ -1,42 +1,58 @@
 package com.example.topratedmoviewitharchitecturepattern.top_rated
 
-import android.app.Application
+import androidx.lifecycle.MutableLiveData
 import com.example.topratedmoviewitharchitecturepattern.CoroutineTestRule
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import io.mockk.MockKAnnotations
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.runners.JUnit4
 
-@RunWith(MockitoJUnitRunner::class)
+@ExperimentalCoroutinesApi
+@RunWith(JUnit4::class)
 class MovieViewModelTest {
-    private lateinit var sut: MovieViewModel
-    @Mock
-    lateinit var application: Application
-    @Mock
+
+    @InjectMockKs
+    lateinit var sut: MovieViewModel
+
+    @MockK
     lateinit var movieRepository: MovieRepository
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
+    private val mainTestThread = TestCoroutineDispatcher()
+
     @Before
     fun setUp() {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+        Dispatchers.setMain(mainTestThread)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainTestThread.cleanupTestCoroutines()
     }
 
     @Test
-    fun `should invoke fetchMovies of MovieRepository when fetchMovies is called`() =
+    fun `should invoke fetchMovies of MovieRepository when fetchMovies is called`() {
         runBlocking {
-            sut = MovieViewModel(
-                application,
-                movieRepository,
-                coroutinesTestRule.testDispatcherProvider
-            )
+            every { movieRepository.getMovies() }.returns(MutableLiveData())
             sut.fetchMovies()
-            verify(movieRepository, times(1)).fetchMovies()
+            coVerify(atMost = 1) { movieRepository.fetchMovies() }
         }
+    }
 }

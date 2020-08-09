@@ -4,13 +4,17 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.topratedmoviewitharchitecturepattern.database.DBMovie
 import com.example.topratedmoviewitharchitecturepattern.database.MovieDao
 import com.example.topratedmoviewitharchitecturepattern.database.MovieDatabase
-import com.example.topratedmoviewitharchitecturepattern.ext.mapToDbMovie
 import com.example.topratedmoviewitharchitecturepattern.ext.mapToMovie
 import com.example.topratedmoviewitharchitecturepattern.model.Movie
 import com.example.topratedmoviewitharchitecturepattern.model.MovieListResponse
 import com.example.topratedmoviewitharchitecturepattern.network.MovieApi
-import com.nhaarman.mockitokotlin2.whenever
+import io.mockk.MockKAnnotations
+import io.mockk.coEvery
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
@@ -22,87 +26,72 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.junit.MockitoJUnitRunner
+import org.junit.runners.JUnit4
 import retrofit2.Retrofit
-import retrofit2.create
 
-@RunWith(MockitoJUnitRunner::class)
+@ExperimentalCoroutinesApi
+@RunWith(JUnit4::class)
 class MovieRepositoryTest {
+    @InjectMockKs
     private lateinit var sut: MovieRepository
+
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
 
-    @Mock
+    @MockK
     lateinit var retrofit: Retrofit
-    @Mock
+
+    @MockK
     lateinit var db: MovieDatabase
 
+    @MockK
     lateinit var dbDao: MovieDao
-    lateinit var emptyDbDao: MovieDao
+
+    @MockK
     lateinit var movieApi: MovieApi
-    val cachedMovies = listOf(DBMovie(1, "22", 2.2))
-    val movieResponse = MovieListResponse("1", arrayListOf(Movie(1, "22", 2.2)))
+    private val cachedMovies = listOf(DBMovie(1, "22", 2.2))
+    private val movieResponse = MovieListResponse("1", arrayListOf(Movie(1, "22", 2.2)))
     private val mainTestThread = TestCoroutineDispatcher()
 
 
     @Before
     fun setUp() {
-        dbDao = object : MovieDao {
-            override suspend fun getAll(): List<DBMovie> {
-                return listOf(DBMovie(1, "22", 2.2))
-            }
+        MockKAnnotations.init(this, relaxUnitFun = true)
+        every { db.movieDao() }.returns(dbDao)
+        Dispatchers.setMain(mainTestThread)
+    }
 
-            override suspend fun addMovies(movies: List<DBMovie>) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        }
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainTestThread.cleanupTestCoroutines()
+    }
 
-        emptyDbDao = object : MovieDao {
-            override suspend fun getAll(): List<DBMovie> {
-                return listOf()
-            }
+    @Test
+    fun `when fetchMovies is called then return movies from cache if cache is not empty`() {
+        runBlockingTest {
+            coEvery { dbDao.getAll() }.returns(cachedMovies)
+            val movieLiveData = sut.getMovies()
+            sut.fetchMovies()
 
-            override suspend fun addMovies(movies: List<DBMovie>) {
-                movies
-            }
-        }
-        movieApi = object : MovieApi {
-            override suspend fun fetchTopRatedMovies(apiKey: String): MovieListResponse {
-                return movieResponse
-            }
+            assertEquals(movieLiveData.value, cachedMovies.mapToMovie())
         }
     }
 
     @Test
-    fun `when fetchMovies is called then return movies from cache if cache is not empty`() =
+    fun `when fetchMovies is called then return movies from API call response if cache is empty`() {
         runBlockingTest {
             sut = MovieRepository(retrofit, db)
-            whenever(db.movieDao()).thenReturn(dbDao)
-            //whenever(dbDao.getAll()).thenReturn(cachedMovies)
+            coEvery { movieApi.fetchTopRatedMovies(any()) }.returns(movieResponse)
+            coEvery { dbDao.getAll() }.returns(emptyList())
+            every { retrofit.create(MovieApi::class.java) }.returns(movieApi)
             val movieLiveData = sut.getMovies()
-
-
-            sut.fetchMovies()
-
-            assertEquals(movieLiveData.value, cachedMovies.mapToMovie())
-
-        }
-
-    @Test
-    fun `when fetchMovies is called then return movies from API call response if cache is empty`() =
-        runBlockingTest {
-            sut = MovieRepository(retrofit, db)
-            whenever(db.movieDao()).thenReturn(emptyDbDao)
-            whenever(retrofit.create(MovieApi::class.java)).thenReturn(movieApi)
-            val movieLiveData = sut.getMovies()
-
 
             sut.fetchMovies()
 
             assertEquals(movieLiveData.value, movieResponse.results)
 
         }
+    }
 
 }

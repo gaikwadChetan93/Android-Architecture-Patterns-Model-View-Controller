@@ -26,7 +26,7 @@ Libraries used
 4. LiveData
 5. WorkManager
 6. ViewModel
-7. Mockito
+7. MockK
 
 App architecture is a way of organizing the different modules of the project in a way to make the code easy to understand, well structured, easier to work with and manage the responsibility of each module efficiently. There are many architecture patterns available in Android like Model-View-Controller(MVC), Model-View-Presenter(MVP), Model-View-Intent(MVI), Model-View-View-Model(MVVM) etc. Here we are going to focus on Model-View-View-Model(MVVM) App architecture. 
 
